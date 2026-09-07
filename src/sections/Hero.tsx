@@ -24,18 +24,16 @@ import { EASE } from "../lib/motion";
 import { scrollTo } from "../lib/scroll";
 
 /* ------------------------------------------------------------------ */
-/*  Intro — round loader + door-opening transition                     */
+/*  Intro — round loader that zooms into the hero                      */
 /* ------------------------------------------------------------------ */
-
-const DOOR_EASE = [0.83, 0, 0.17, 1] as const;
 
 function IntroOverlay({
   onReveal,
   onDone,
 }: {
-  /** Fired the moment the doors start opening, so the hero can reveal behind them. */
+  /** Fired the moment the zoom starts, so the hero can reveal behind it. */
   onReveal: () => void;
-  /** Fired once the doors have fully opened — unmounts the overlay. */
+  /** Fired once the zoom transition has finished — unmounts the overlay. */
   onDone: () => void;
 }) {
   const progress = useMotionValue(0);
@@ -59,26 +57,28 @@ function IntroOverlay({
     return () => controls.stop();
   }, [progress]);
 
-  // Brief "ACCESS GRANTED" beat, then the doors open and the hero reveals.
+  // Brief "ACCESS GRANTED" beat, then the zoom begins.
   useEffect(() => {
-    if (!granted) return;
+    if (!granted || opening) return;
     const t = window.setTimeout(() => {
       setOpening(true);
       onReveal();
-    }, 340);
+    }, 300);
     return () => window.clearTimeout(t);
-  }, [granted, onReveal]);
+  }, [granted, opening, onReveal]);
 
-  // Doors finishing → hand control back to the page.
+  // Zoom finished → hand control back to the page.
   useEffect(() => {
     if (!opening) return;
-    const t = window.setTimeout(onDone, 1180);
+    const t = window.setTimeout(onDone, 1080);
     return () => window.clearTimeout(t);
   }, [opening, onDone]);
 
   const skip = () => {
     progress.set(100);
     setGranted(true);
+    setOpening(true);
+    onReveal();
   };
 
   return (
@@ -88,142 +88,86 @@ function IntroOverlay({
       transition={{ duration: 0.25 }}
       aria-label="Loading Shodhan's digital world"
     >
-      {/* ------------------------- Doors ------------------------- */}
+      {/* Light burst — expands from the center as the loader zooms through */}
       <motion.div
         aria-hidden="true"
-        className="absolute inset-y-0 left-0 w-1/2"
-        initial={{ x: "0%" }}
-        animate={{ x: opening ? "-101%" : "0%" }}
-        transition={{ duration: 1.05, ease: DOOR_EASE }}
-      >
-        <div
-          className="relative h-full w-full overflow-hidden border-r border-electric/30"
-          style={{
-            backgroundImage:
-              "radial-gradient(130% 100% at 100% 50%, rgba(77,141,255,0.1), transparent 60%), linear-gradient(180deg, #04060c, #070b14 55%, #05070d)",
-          }}
-        >
-          <div className="grid-floor absolute inset-0 opacity-40" />
-          <div className="absolute inset-y-0 right-0 w-px bg-gradient-to-b from-transparent via-electric/70 to-transparent" />
-          <p className="absolute bottom-8 left-6 font-mono text-[0.58rem] uppercase tracking-[0.34em] text-steel/60 sm:left-10">
-            SHODHAN.OS <span className="text-electric/70">v1.0</span>
-          </p>
-        </div>
-      </motion.div>
-
-      <motion.div
-        aria-hidden="true"
-        className="absolute inset-y-0 right-0 w-1/2"
-        initial={{ x: "0%" }}
-        animate={{ x: opening ? "101%" : "0%" }}
-        transition={{ duration: 1.05, ease: DOOR_EASE }}
-      >
-        <div
-          className="relative h-full w-full overflow-hidden border-l border-electric/30"
-          style={{
-            backgroundImage:
-              "radial-gradient(130% 100% at 0% 50%, rgba(77,141,255,0.1), transparent 60%), linear-gradient(180deg, #04060c, #070b14 55%, #05070d)",
-          }}
-        >
-          <div className="grid-floor absolute inset-0 opacity-40" />
-          <div className="absolute inset-y-0 left-0 w-px bg-gradient-to-b from-transparent via-electric/70 to-transparent" />
-          <p className="absolute bottom-8 right-6 font-mono text-[0.58rem] uppercase tracking-[0.3em] text-steel/60 sm:right-10">
-            KARNATAKA · INDIA
-          </p>
-        </div>
-      </motion.div>
-
-      {/* Center seam glow */}
-      <motion.div
-        aria-hidden="true"
-        className="absolute inset-y-0 left-1/2 z-[5] w-px -translate-x-1/2 bg-gradient-to-b from-transparent via-electric/80 to-transparent"
-        animate={{ opacity: opening ? 0 : 1 }}
-        transition={{ duration: 0.3 }}
+        className="pointer-events-none absolute left-1/2 top-1/2 h-[130vmax] w-[130vmax] -translate-x-1/2 -translate-y-1/2 rounded-full"
+        initial={{ scale: 0, opacity: 0 }}
+        animate={opening ? { scale: 1, opacity: [0, 0.55, 0] } : { scale: 0, opacity: 0 }}
+        transition={opening ? { duration: 1, ease: EASE, times: [0, 0.35, 1] } : { duration: 0.01 }}
+        style={{
+          background:
+            "radial-gradient(circle, rgba(125,180,255,0.4) 0%, rgba(62,224,255,0.14) 42%, transparent 72%)",
+        }}
       />
 
-      {/* --------------------- Round loader --------------------- */}
-      <AnimatePresence>
-        {!opening && (
-          <motion.div
-            key="loader"
-            className="absolute inset-0 z-10 flex flex-col items-center justify-center"
-            exit={{ opacity: 0, scale: 1.14, filter: "blur(5px)" }}
-            transition={{ duration: 0.4, ease: "easeInOut" }}
-          >
-            <div className="relative h-44 w-44 sm:h-52 sm:w-52">
-              {/* Track + inner dash ring + progress ring */}
-              <svg viewBox="0 0 120 120" className="h-full w-full -rotate-90">
-                <circle cx="60" cy="60" r={R} fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth="2" />
-                <circle
-                  cx="60"
-                  cy="60"
-                  r={R - 9}
-                  fill="none"
-                  stroke="rgba(77,141,255,0.18)"
-                  strokeWidth="1"
-                  strokeDasharray="2 6"
-                  style={{ animation: "spin 12s linear infinite" }}
-                />
-                <motion.circle
-                  cx="60"
-                  cy="60"
-                  r={R}
-                  fill="none"
-                  stroke="#7db4ff"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeDasharray={CIRC}
-                  style={{
-                    strokeDashoffset: dashOffset,
-                    filter: "drop-shadow(0 0 6px rgba(77,141,255,0.9))",
-                  }}
-                />
-              </svg>
-              {/* Percentage */}
-              <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="font-display text-5xl font-bold tabular-nums tracking-tight text-frost text-glow sm:text-6xl">
-                  {pct}
-                  <span className="align-top text-xl text-electric sm:text-2xl">%</span>
-                </span>
-              </div>
-            </div>
+      {/* Loader — zooms toward the viewer and dissolves */}
+      <motion.div
+        className="absolute inset-0 z-10 flex flex-col items-center justify-center"
+        animate={
+          opening
+            ? { scale: 3.6, opacity: 0, filter: "blur(12px)" }
+            : { scale: 1, opacity: 1, filter: "blur(0px)" }
+        }
+        transition={opening ? { duration: 0.95, ease: EASE } : { duration: 0.01 }}
+      >
+        <div className="relative h-44 w-44 sm:h-52 sm:w-52">
+          {/* Track + inner dash ring + progress ring */}
+          <svg viewBox="0 0 120 120" className="h-full w-full -rotate-90">
+            <circle cx="60" cy="60" r={R} fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth="2" />
+            <circle
+              cx="60"
+              cy="60"
+              r={R - 9}
+              fill="none"
+              stroke="rgba(77,141,255,0.18)"
+              strokeWidth="1"
+              strokeDasharray="2 6"
+              style={{ animation: "spin 12s linear infinite" }}
+            />
+            <motion.circle
+              cx="60"
+              cy="60"
+              r={R}
+              fill="none"
+              stroke="#7db4ff"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeDasharray={CIRC}
+              style={{
+                strokeDashoffset: dashOffset,
+                filter: "drop-shadow(0 0 6px rgba(77,141,255,0.9))",
+              }}
+            />
+          </svg>
+          {/* Percentage */}
+          <div className="absolute inset-0 flex flex-col items-center justify-center">
+            <span className="font-display text-5xl font-bold tabular-nums tracking-tight text-frost text-glow sm:text-6xl">
+              {pct}
+              <span className="align-top text-xl text-electric sm:text-2xl">%</span>
+            </span>
+          </div>
+        </div>
 
-            <p className="mt-8 h-4 font-mono text-[0.62rem] uppercase tracking-[0.42em] text-steel">
-              {granted ? (
-                <span className="text-signal">ACCESS GRANTED</span>
-              ) : (
-                <>SYSTEM INITIALIZING<span className="ml-1 animate-blink text-electric">▌</span></>
-              )}
-            </p>
-            <p className="mt-2.5 font-mono text-[0.52rem] uppercase tracking-[0.34em] text-steel/50">
-              SHODHAN.OS <span className="text-electric/60">v1.0</span> · CLOUD CORE
-            </p>
+        <p className="mt-8 h-4 font-mono text-[0.62rem] uppercase tracking-[0.42em] text-steel">
+          {granted ? (
+            <span className="text-signal">ACCESS GRANTED</span>
+          ) : (
+            <>SYSTEM INITIALIZING<span className="ml-1 animate-blink text-electric">▌</span></>
+          )}
+        </p>
+        <p className="mt-2.5 font-mono text-[0.52rem] uppercase tracking-[0.34em] text-steel/50">
+          SHODHAN.OS <span className="text-electric/60">v1.0</span> · CLOUD CORE
+        </p>
 
-            <button
-              type="button"
-              onClick={skip}
-              className="mt-10 flex items-center gap-2 font-mono text-[0.6rem] uppercase tracking-[0.3em] text-steel/60 transition-colors hover:text-mist"
-            >
-              <SkipForward size={12} /> SKIP LOADING
-            </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* ACCESS GRANTED flash as the doors part */}
-      {opening && (
-        <motion.div
-          key="granted"
-          className="pointer-events-none absolute inset-0 z-[6] flex items-center justify-center"
-          initial={{ opacity: 0, scale: 0.92 }}
-          animate={{ opacity: [0, 1, 0], scale: [0.92, 1, 1.04] }}
-          transition={{ duration: 0.95, times: [0, 0.35, 1], ease: "easeInOut" }}
+        <button
+          type="button"
+          onClick={skip}
+          className="mt-10 flex items-center gap-2 font-mono text-[0.6rem] uppercase tracking-[0.3em] text-steel/60 transition-colors hover:text-mist"
         >
-          <p className="font-mono text-sm font-semibold tracking-[0.5em] text-frost text-glow sm:text-base">
-            ACCESS GRANTED<span className="animate-blink text-electric">_</span>
-          </p>
-        </motion.div>
-      )}
+          <SkipForward size={12} /> SKIP LOADING
+        </button>
+      </motion.div>
     </motion.div>
   );
 }
