@@ -156,7 +156,7 @@ function IntroOverlay({
       onPointerDown={skip}
     >
       {/* Ambient scene behind the loader */}
-      <div className="grid-floor absolute inset-0 opacity-50" aria-hidden="true" />
+      <div className="grid-floor absolute inset-0 opacity-70" aria-hidden="true" />
       <div
         aria-hidden="true"
         className="absolute inset-0"
@@ -379,7 +379,7 @@ function IntroOverlay({
       </div>
 
       {/* Animated scanlines keyframe */}
-      <style>{`@keyframes scanmove { from { background-position: 0 0; } to { background-position: 0 80px; } }`}</style>
+
     </motion.div>
   );
 }
@@ -537,7 +537,7 @@ export function Hero() {
         className="pointer-events-none absolute inset-x-0 bottom-0 h-[42vh] opacity-50"
         style={{
           backgroundImage:
-            "linear-gradient(rgba(77,141,255,0.16) 1px, transparent 1px), linear-gradient(90deg, rgba(77,141,255,0.16) 1px, transparent 1px)",
+            "linear-gradient(rgba(77,141,255,0.22) 1px, transparent 1px), linear-gradient(90deg, rgba(77,141,255,0.22) 1px, transparent 1px)",
           backgroundSize: "56px 56px",
           transform: "perspective(900px) rotateX(62deg) scale(1.4)",
           transformOrigin: "bottom",
@@ -590,9 +590,12 @@ export function Hero() {
             variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: EASE } } }}
             className="mt-7 flex flex-wrap items-center gap-x-4 gap-y-3"
           >
-            <p className="font-mono text-[clamp(0.78rem,2.2vw,1rem)] font-semibold uppercase tracking-[0.32em] text-electric">
-              {identity.role}
-            </p>
+            <p
+            className="font-mono text-[clamp(0.78rem,2.2vw,1rem)] font-semibold uppercase tracking-[0.32em] text-cyanflare"
+            style={{ textShadow: "0 0 20px rgba(62,224,255,0.55)" }}
+          >
+            {identity.role}
+          </p>
             <span className="h-4 w-px bg-line" aria-hidden="true" />
             <p className="font-mono text-[0.62rem] uppercase tracking-[0.24em] text-steel">
               Karnataka, India

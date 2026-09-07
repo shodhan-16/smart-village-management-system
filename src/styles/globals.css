@@ -8,7 +8,7 @@
 
 :root {
   color-scheme: dark;
-  --bg: #05070e;
+  --bg: #020409;
   --accent: #4d8dff;
   --accent-bright: #7db4ff;
   --cyan: #3ee0ff;
@@ -25,9 +25,9 @@ body {
   @apply bg-void text-mist font-body antialiased;
   overflow-x: hidden;
   background-image:
-    radial-gradient(1100px 600px at 75% -8%, rgba(77, 141, 255, 0.08), transparent 60%),
-    radial-gradient(900px 620px at 6% 28%, rgba(167, 139, 250, 0.05), transparent 55%),
-    radial-gradient(1000px 720px at 92% 78%, rgba(62, 224, 255, 0.04), transparent 55%);
+    radial-gradient(1100px 620px at 72% -8%, rgba(77, 141, 255, 0.11), transparent 60%),
+    radial-gradient(900px 640px at 4% 26%, rgba(167, 139, 250, 0.08), transparent 55%),
+    radial-gradient(1000px 740px at 94% 80%, rgba(62, 224, 255, 0.07), transparent 55%);
   background-attachment: fixed;
 }
 
@@ -72,24 +72,26 @@ body {
   /* Typography ----------------------------------------------------- */
 
   .mono-label {
-    @apply font-mono text-[0.62rem] font-medium uppercase tracking-[0.26em] text-steel;
+    @apply font-mono text-[0.62rem] font-medium uppercase tracking-[0.26em] text-cyanflare/75;
   }
 
   .section-number {
     @apply font-mono text-[0.68rem] font-semibold tracking-[0.28em] text-electric;
+    text-shadow: 0 0 14px rgba(77, 141, 255, 0.6);
   }
 
   .kicker {
-    @apply flex items-center gap-3 font-mono text-[0.62rem] font-medium uppercase tracking-[0.28em] text-steel;
+    @apply flex items-center gap-3 font-mono text-[0.62rem] font-medium uppercase tracking-[0.28em] text-cyanflare/75;
   }
 
   .kicker::before {
     content: "";
-    @apply block h-px w-7 bg-electric/70;
+    @apply block h-px w-7 bg-electric/80;
   }
 
   .display-xl {
     @apply font-display text-4xl font-bold leading-[1.04] tracking-[-0.02em] text-frost sm:text-5xl lg:text-[3.4rem];
+    text-shadow: 0 0 32px rgba(77, 141, 255, 0.16), 0 0 90px rgba(62, 224, 255, 0.08);
   }
 
   .display-2xl {
@@ -103,21 +105,23 @@ body {
   /* Surfaces ------------------------------------------------------- */
 
   .panel {
-    @apply rounded-xl border border-line bg-white/[0.025];
+    @apply rounded-xl border border-line bg-[#05080f]/80;
     box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.03),
-      0 24px 48px -32px rgba(0, 0, 0, 0.9);
+      inset 0 1px 0 rgba(255, 255, 255, 0.04),
+      inset 0 0 40px rgba(77, 141, 255, 0.03),
+      0 24px 48px -32px rgba(0, 0, 0, 0.95);
   }
 
   .card {
-    @apply relative overflow-hidden rounded-xl border border-line bg-white/[0.02] transition-[border-color,background-color,box-shadow,transform] duration-500;
+    @apply relative overflow-hidden rounded-xl border border-line bg-[#04070d]/80 transition-[border-color,background-color,box-shadow,transform] duration-500;
   }
   .card:hover {
-    @apply border-electric/35 bg-white/[0.035];
+    @apply border-electric/45 bg-[#060b16]/90;
     box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.04),
-      0 0 0 1px rgba(77, 141, 255, 0.08),
-      0 24px 60px -30px rgba(77, 141, 255, 0.25);
+      inset 0 1px 0 rgba(255, 255, 255, 0.05),
+      0 0 0 1px rgba(77, 141, 255, 0.12),
+      0 0 28px -6px rgba(77, 141, 255, 0.28),
+      0 24px 60px -30px rgba(77, 141, 255, 0.35);
   }
   /* Game-style scanline sweep across any card on hover */
   .card::before {
@@ -169,11 +173,11 @@ body {
   }
 
   .cta-ghost {
-    @apply cta border border-line bg-white/[0.02] text-mist;
+    @apply cta border border-electric/20 bg-electric/[0.04] text-mist;
   }
   .cta-ghost:hover {
-    @apply border-electric/45 bg-white/[0.05] text-frost;
-    box-shadow: 0 8px 24px -16px rgba(77, 141, 255, 0.4);
+    @apply border-electric/60 bg-electric/[0.09] text-frost;
+    box-shadow: 0 0 24px -8px rgba(77, 141, 255, 0.5), inset 0 0 18px rgba(77, 141, 255, 0.06);
   }
 
   .cta-link {
@@ -200,21 +204,46 @@ body {
 
   .grid-floor {
     background-image:
-      linear-gradient(rgba(77, 141, 255, 0.06) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(77, 141, 255, 0.06) 1px, transparent 1px);
+      linear-gradient(rgba(77, 141, 255, 0.11) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(77, 141, 255, 0.11) 1px, transparent 1px);
     background-size: 64px 64px;
     mask-image: radial-gradient(ellipse 90% 70% at 50% 40%, black 30%, transparent 75%);
     -webkit-mask-image: radial-gradient(ellipse 90% 70% at 50% 40%, black 30%, transparent 75%);
   }
 
-  .noise::after {
-    content: "";
+  /* Fixed game HUD frame around the viewport (desktop) */
+  .hud-frame {
     position: fixed;
     inset: 0;
-    z-index: 60;
+    z-index: 45;
     pointer-events: none;
-    opacity: 0.02;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .hud-frame span {
+    position: absolute;
+    width: 26px;
+    height: 26px;
+    border-color: rgba(77, 141, 255, 0.45);
+  }
+  .hud-frame .tl { top: 84px; left: 10px; border-left: 2px solid; border-top: 2px solid; }
+  .hud-frame .tr { top: 84px; right: 10px; border-right: 2px solid; border-top: 2px solid; }
+  .hud-frame .bl { bottom: 10px; left: 10px; border-left: 2px solid; border-bottom: 2px solid; }
+  .hud-frame .br { bottom: 10px; right: 10px; border-right: 2px solid; border-bottom: 2px solid; }
+
+  /* Global CRT-style scanlines over everything */
+  .scanlines {
+    position: fixed;
+    inset: 0;
+    z-index: 44;
+    pointer-events: none;
+    opacity: 0.05;
+    background-image: repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.4) 0px,
+      rgba(255, 255, 255, 0.4) 1px,
+      transparent 1px,
+      transparent 4px
+    );
+    animation: scanmove 10s linear infinite;
   }
 
   .status-dot {
@@ -227,7 +256,17 @@ body {
   }
 
   .text-glow {
-    text-shadow: 0 0 24px rgba(77, 141, 255, 0.35), 0 0 80px rgba(77, 141, 255, 0.15);
+    text-shadow: 0 0 28px rgba(77, 141, 255, 0.45), 0 0 110px rgba(62, 224, 255, 0.2);
+  }
+
+  .noise::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    pointer-events: none;
+    opacity: 0.02;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
 
   .stack-list {
@@ -251,6 +290,15 @@ body {
   50% {
     text-shadow: -1.5px 0 rgba(255, 80, 140, 0.55), 1.5px 0 rgba(62, 224, 255, 0.55);
     transform: translateX(0.5px);
+  }
+}
+
+@keyframes scanmove {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 0 80px;
   }
 }
 

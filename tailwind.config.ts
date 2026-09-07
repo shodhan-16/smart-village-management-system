@@ -5,13 +5,13 @@ export default {
   theme: {
     extend: {
       colors: {
-        void: "#05070e",
-        ink: "#080d18",
-        panel: "#0c1322",
-        line: "rgba(148,163,184,0.12)",
-        steel: "#8791a6",
-        mist: "#cbd6e8",
-        frost: "#eef4ff",
+        void: "#020409",
+        ink: "#05080f",
+        panel: "#070c16",
+        line: "rgba(125,180,255,0.13)",
+        steel: "#8494ad",
+        mist: "#c6d3e6",
+        frost: "#eaf2ff",
         electric: {
           DEFAULT: "#4d8dff",
           bright: "#7db4ff",

@@ -2,6 +2,7 @@ import { Background } from "./components/Background";
 import { CursorGlow } from "./components/CursorGlow";
 import { Footer } from "./components/Footer";
 import { Header } from "./components/Header";
+import { HudFrame } from "./components/HudFrame";
 import { ScrollProgress } from "./components/ScrollProgress";
 import { Marquee } from "./components/Marquee";
 import { SectionGate } from "./components/SectionGate";
@@ -21,6 +22,7 @@ export default function App() {
     <div className="noise relative min-h-screen overflow-x-clip">
       <Background />
       <CursorGlow />
+      <HudFrame />
       <Header />
       <ScrollProgress />
 

@@ -95,7 +95,7 @@ export function Background() {
         const twinkle = 0.35 + 0.65 * (0.5 + 0.5 * Math.sin(t * p.speed * 60 + p.phase));
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fillStyle = `hsla(${p.hue}, 90%, 72%, ${0.12 * twinkle})`;
+        ctx.fillStyle = `hsla(${p.hue}, 92%, 74%, ${0.2 * twinkle})`;
         ctx.fill();
       }
 
@@ -162,7 +162,7 @@ export function Background() {
       />
 
       {/* Particles + data streams */}
-      <canvas ref={canvasRef} className="absolute inset-0 opacity-90" />
+      <canvas ref={canvasRef} className="absolute inset-0" />
 
       {/* Subtle sweeping scanline */}
       <div
