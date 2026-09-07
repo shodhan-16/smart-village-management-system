@@ -1,5 +1,13 @@
-import { useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
+import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  AnimatePresence,
+  animate,
+  motion,
+  useMotionValue,
+  useMotionValueEvent,
+  useScroll,
+  useTransform,
+} from "framer-motion";
 import {
   ArrowRight,
   Cloud,
@@ -10,83 +18,212 @@ import {
   Server,
   SkipForward,
 } from "lucide-react";
-import { bootLines, heroMeta, identity, links, statusLines } from "../data/content";
+import { heroMeta, identity, links, statusLines } from "../data/content";
 import { useReducedMotion } from "../hooks/useReducedMotion";
 import { EASE } from "../lib/motion";
 import { scrollTo } from "../lib/scroll";
 
 /* ------------------------------------------------------------------ */
-/*  Boot sequence                                                      */
+/*  Intro — round loader + door-opening transition                     */
 /* ------------------------------------------------------------------ */
 
-function BootSequence({ done, onDone, onSkip }: { done: boolean; onDone: () => void; onSkip: () => void }) {
-  const reduced = useReducedMotion();
-  const [visible, setVisible] = useState(0);
+const DOOR_EASE = [0.83, 0, 0.17, 1] as const;
 
+function IntroOverlay({
+  onReveal,
+  onDone,
+}: {
+  /** Fired the moment the doors start opening, so the hero can reveal behind them. */
+  onReveal: () => void;
+  /** Fired once the doors have fully opened — unmounts the overlay. */
+  onDone: () => void;
+}) {
+  const progress = useMotionValue(0);
+  const [pct, setPct] = useState(0);
+  const [granted, setGranted] = useState(false);
+  const [opening, setOpening] = useState(false);
+
+  const R = 54;
+  const CIRC = 2 * Math.PI * R;
+  const dashOffset = useTransform(progress, (v) => CIRC * (1 - v / 100));
+
+  useMotionValueEvent(progress, "change", (v) => setPct(Math.round(v)));
+
+  // Circular loader: 0 → 100
   useEffect(() => {
-    if (done || reduced) {
-      onDone();
-      return;
-    }
-    const timers = bootLines.map((_, i) => window.setTimeout(() => setVisible(i + 1), 350 + i * 600));
-    const accessTimer = window.setTimeout(() => setVisible(bootLines.length + 1), 350 + bootLines.length * 600 + 250);
-    const doneTimer = window.setTimeout(onDone, 350 + bootLines.length * 600 + 1250);
-    return () => {
-      timers.forEach(clearTimeout);
-      clearTimeout(accessTimer);
-      clearTimeout(doneTimer);
-    };
-  }, [done, reduced, onDone]);
+    const controls = animate(progress, 100, {
+      duration: 2.1,
+      ease: "easeInOut",
+      onComplete: () => setGranted(true),
+    });
+    return () => controls.stop();
+  }, [progress]);
 
-  if (done) return null;
+  // Brief "ACCESS GRANTED" beat, then the doors open and the hero reveals.
+  useEffect(() => {
+    if (!granted) return;
+    const t = window.setTimeout(() => {
+      setOpening(true);
+      onReveal();
+    }, 340);
+    return () => window.clearTimeout(t);
+  }, [granted, onReveal]);
+
+  // Doors finishing → hand control back to the page.
+  useEffect(() => {
+    if (!opening) return;
+    const t = window.setTimeout(onDone, 1180);
+    return () => window.clearTimeout(t);
+  }, [opening, onDone]);
+
+  const skip = () => {
+    progress.set(100);
+    setGranted(true);
+  };
 
   return (
     <motion.div
-      key="boot"
-      className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-void"
-      exit={{ opacity: 0, scale: 1.06, filter: "blur(6px)" }}
-      transition={{ duration: 0.7, ease: EASE }}
-      aria-hidden="true"
+      className="absolute inset-0 z-30 overflow-hidden bg-void"
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.25 }}
+      aria-label="Loading Shodhan's digital world"
     >
-      <div className="w-[min(92vw,34rem)]">
-        <p className="mb-8 flex items-center gap-2 font-mono text-[0.62rem] uppercase tracking-[0.4em] text-steel/70">
-          <span className="h-1.5 w-1.5 rounded-full bg-electric" />
-          SHODHAN.OS <span className="text-electric">v1.0</span>
-        </p>
-
-        <div className="min-h-[7rem] font-mono text-[0.8rem] leading-loose text-mist sm:text-sm">
-          {bootLines.slice(0, visible).map((line) => (
-            <p key={line} className="flex items-center gap-2">
-              <span className="text-electric/80">{line.includes("access") ? "✔" : "▸"}</span>
-              <span className={line.includes("access") ? "text-frost" : undefined}>{line}</span>
-              <span className="inline-block h-3.5 w-1.5 animate-blink bg-electric align-middle" />
-            </p>
-          ))}
-          {visible > bootLines.length && (
-            <p className="mt-4 text-base font-semibold tracking-[0.5em] text-frost text-glow sm:text-xl">
-              ACCESS GRANTED<span className="animate-blink text-electric">_</span>
-            </p>
-          )}
-        </div>
-
-        {/* Progress beam */}
-        <div className="mt-8 h-px w-full overflow-hidden bg-white/10">
-          <motion.div
-            className="h-full bg-gradient-to-r from-electric to-cyanflare"
-            initial={{ width: "0%" }}
-            animate={{ width: `${Math.min((visible / (bootLines.length + 1)) * 100, 100)}%` }}
-            transition={{ duration: 0.35, ease: "easeOut" }}
-          />
-        </div>
-
-        <button
-          type="button"
-          onClick={onSkip}
-          className="mt-6 flex items-center gap-2 font-mono text-[0.6rem] uppercase tracking-[0.3em] text-steel/60 transition-colors hover:text-mist"
+      {/* ------------------------- Doors ------------------------- */}
+      <motion.div
+        aria-hidden="true"
+        className="absolute inset-y-0 left-0 w-1/2"
+        initial={{ x: "0%" }}
+        animate={{ x: opening ? "-101%" : "0%" }}
+        transition={{ duration: 1.05, ease: DOOR_EASE }}
+      >
+        <div
+          className="relative h-full w-full overflow-hidden border-r border-electric/30"
+          style={{
+            backgroundImage:
+              "radial-gradient(130% 100% at 100% 50%, rgba(77,141,255,0.1), transparent 60%), linear-gradient(180deg, #04060c, #070b14 55%, #05070d)",
+          }}
         >
-          <SkipForward size={12} /> SKIP INTRO
-        </button>
-      </div>
+          <div className="grid-floor absolute inset-0 opacity-40" />
+          <div className="absolute inset-y-0 right-0 w-px bg-gradient-to-b from-transparent via-electric/70 to-transparent" />
+          <p className="absolute bottom-8 left-6 font-mono text-[0.58rem] uppercase tracking-[0.34em] text-steel/60 sm:left-10">
+            SHODHAN.OS <span className="text-electric/70">v1.0</span>
+          </p>
+        </div>
+      </motion.div>
+
+      <motion.div
+        aria-hidden="true"
+        className="absolute inset-y-0 right-0 w-1/2"
+        initial={{ x: "0%" }}
+        animate={{ x: opening ? "101%" : "0%" }}
+        transition={{ duration: 1.05, ease: DOOR_EASE }}
+      >
+        <div
+          className="relative h-full w-full overflow-hidden border-l border-electric/30"
+          style={{
+            backgroundImage:
+              "radial-gradient(130% 100% at 0% 50%, rgba(77,141,255,0.1), transparent 60%), linear-gradient(180deg, #04060c, #070b14 55%, #05070d)",
+          }}
+        >
+          <div className="grid-floor absolute inset-0 opacity-40" />
+          <div className="absolute inset-y-0 left-0 w-px bg-gradient-to-b from-transparent via-electric/70 to-transparent" />
+          <p className="absolute bottom-8 right-6 font-mono text-[0.58rem] uppercase tracking-[0.3em] text-steel/60 sm:right-10">
+            KARNATAKA · INDIA
+          </p>
+        </div>
+      </motion.div>
+
+      {/* Center seam glow */}
+      <motion.div
+        aria-hidden="true"
+        className="absolute inset-y-0 left-1/2 z-[5] w-px -translate-x-1/2 bg-gradient-to-b from-transparent via-electric/80 to-transparent"
+        animate={{ opacity: opening ? 0 : 1 }}
+        transition={{ duration: 0.3 }}
+      />
+
+      {/* --------------------- Round loader --------------------- */}
+      <AnimatePresence>
+        {!opening && (
+          <motion.div
+            key="loader"
+            className="absolute inset-0 z-10 flex flex-col items-center justify-center"
+            exit={{ opacity: 0, scale: 1.14, filter: "blur(5px)" }}
+            transition={{ duration: 0.4, ease: "easeInOut" }}
+          >
+            <div className="relative h-44 w-44 sm:h-52 sm:w-52">
+              {/* Track + inner dash ring + progress ring */}
+              <svg viewBox="0 0 120 120" className="h-full w-full -rotate-90">
+                <circle cx="60" cy="60" r={R} fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth="2" />
+                <circle
+                  cx="60"
+                  cy="60"
+                  r={R - 9}
+                  fill="none"
+                  stroke="rgba(77,141,255,0.18)"
+                  strokeWidth="1"
+                  strokeDasharray="2 6"
+                  style={{ animation: "spin 12s linear infinite" }}
+                />
+                <motion.circle
+                  cx="60"
+                  cy="60"
+                  r={R}
+                  fill="none"
+                  stroke="#7db4ff"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeDasharray={CIRC}
+                  style={{
+                    strokeDashoffset: dashOffset,
+                    filter: "drop-shadow(0 0 6px rgba(77,141,255,0.9))",
+                  }}
+                />
+              </svg>
+              {/* Percentage */}
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <span className="font-display text-5xl font-bold tabular-nums tracking-tight text-frost text-glow sm:text-6xl">
+                  {pct}
+                  <span className="align-top text-xl text-electric sm:text-2xl">%</span>
+                </span>
+              </div>
+            </div>
+
+            <p className="mt-8 h-4 font-mono text-[0.62rem] uppercase tracking-[0.42em] text-steel">
+              {granted ? (
+                <span className="text-signal">ACCESS GRANTED</span>
+              ) : (
+                <>SYSTEM INITIALIZING<span className="ml-1 animate-blink text-electric">▌</span></>
+              )}
+            </p>
+            <p className="mt-2.5 font-mono text-[0.52rem] uppercase tracking-[0.34em] text-steel/50">
+              SHODHAN.OS <span className="text-electric/60">v1.0</span> · CLOUD CORE
+            </p>
+
+            <button
+              type="button"
+              onClick={skip}
+              className="mt-10 flex items-center gap-2 font-mono text-[0.6rem] uppercase tracking-[0.3em] text-steel/60 transition-colors hover:text-mist"
+            >
+              <SkipForward size={12} /> SKIP LOADING
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ACCESS GRANTED flash as the doors part */}
+      {opening && (
+        <motion.div
+          key="granted"
+          className="pointer-events-none absolute inset-0 z-[6] flex items-center justify-center"
+          initial={{ opacity: 0, scale: 0.92 }}
+          animate={{ opacity: [0, 1, 0], scale: [0.92, 1, 1.04] }}
+          transition={{ duration: 0.95, times: [0, 0.35, 1], ease: "easeInOut" }}
+        >
+          <p className="font-mono text-sm font-semibold tracking-[0.5em] text-frost text-glow sm:text-base">
+            ACCESS GRANTED<span className="animate-blink text-electric">_</span>
+          </p>
+        </motion.div>
+      )}
     </motion.div>
   );
 }
@@ -197,7 +334,8 @@ function CommandCenter() {
 
 export function Hero() {
   const reduced = useReducedMotion();
-  const [bootDone, setBootDone] = useState(false);
+  const [revealed, setRevealed] = useState(false);
+  const [introDone, setIntroDone] = useState(false);
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
 
@@ -207,9 +345,15 @@ export function Hero() {
 
   const letters = identity.firstName.split("");
 
-  // Reduced motion: skip the boot ceremony entirely.
+  const onReveal = useCallback(() => setRevealed(true), []);
+  const onIntroDone = useCallback(() => setIntroDone(true), []);
+
+  // Reduced motion: skip the intro ceremony entirely.
   useEffect(() => {
-    if (reduced) setBootDone(true);
+    if (reduced) {
+      setRevealed(true);
+      setIntroDone(true);
+    }
   }, [reduced]);
 
   return (
@@ -235,14 +379,7 @@ export function Hero() {
       />
 
       <AnimatePresence>
-        {!bootDone && (
-          <BootSequence
-            key="boot"
-            done={bootDone}
-            onDone={() => setBootDone(true)}
-            onSkip={() => setBootDone(true)}
-          />
-        )}
+        {!introDone && <IntroOverlay onReveal={onReveal} onDone={onIntroDone} />}
       </AnimatePresence>
 
       <motion.div
@@ -252,7 +389,7 @@ export function Hero() {
         {/* Identity block */}
         <motion.div
           initial="hidden"
-          animate={bootDone ? "visible" : "hidden"}
+          animate={revealed ? "visible" : "hidden"}
           variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.09, delayChildren: 0.1 } } }}
           className="min-w-0 flex-1"
         >
@@ -346,7 +483,7 @@ export function Hero() {
         <motion.div
           style={reduced ? undefined : { y: panelY }}
           initial={{ opacity: 0, scale: 0.92 }}
-          animate={bootDone ? { opacity: 1, scale: 1 } : {}}
+          animate={revealed ? { opacity: 1, scale: 1 } : {}}
           transition={{ duration: 1, ease: EASE, delay: 0.55 }}
           className="hidden w-full max-w-lg lg:block"
         >
@@ -358,7 +495,7 @@ export function Hero() {
       <motion.div
         style={{ opacity: fade }}
         initial={{ opacity: 0 }}
-        animate={bootDone ? { opacity: 1 } : {}}
+        animate={revealed ? { opacity: 1 } : {}}
         transition={{ delay: 0.9, duration: 0.8 }}
         className="shell relative z-10 hidden items-center justify-between gap-6 border-t border-line/70 py-4 font-mono text-[0.56rem] uppercase tracking-[0.28em] text-steel/70 md:flex"
       >
