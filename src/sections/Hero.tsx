@@ -24,8 +24,46 @@ import { EASE } from "../lib/motion";
 import { scrollTo } from "../lib/scroll";
 
 /* ------------------------------------------------------------------ */
-/*  Intro — round loader that zooms into the hero                      */
+/*  Intro — AAA-game style loader that zooms into the world            */
 /* ------------------------------------------------------------------ */
+
+const PHASES = [
+  "INITIALIZING CLOUD CORE",
+  "LOADING AWS MODULES",
+  "COMPILING SKILL MATRIX",
+  "SYNCING PROJECT FILES",
+  "DEPLOYING INTERFACE",
+];
+
+const LOG_LINES = [
+  "> booting shodhan.os v1.0",
+  "> region mapped: in-south-1",
+  "> iam policies ............... ok",
+  "> ec2 instances .............. ready",
+  "> s3 buckets ................. linked",
+  "> skill matrix ............... compiled",
+  "> project files .............. synced",
+  "> interface .................. deployed",
+  "> access.granted = true",
+];
+
+const LOG_AT = [2, 10, 22, 36, 50, 62, 76, 88, 100];
+
+const TIPS = [
+  "Cloud engineers design for failure — availability is a feature.",
+  "IAM is the security boundary of every AWS account.",
+  "Version control is a discipline, not a tool.",
+  "Every system starts as a problem worth solving.",
+  "Skills are proven by shipped projects, not lists.",
+];
+
+function phaseForPct(pct: number) {
+  if (pct < 20) return 0;
+  if (pct < 42) return 1;
+  if (pct < 62) return 2;
+  if (pct < 85) return 3;
+  return 4;
+}
 
 function IntroOverlay({
   onReveal,
@@ -40,6 +78,8 @@ function IntroOverlay({
   const [pct, setPct] = useState(0);
   const [granted, setGranted] = useState(false);
   const [opening, setOpening] = useState(false);
+  const [tip, setTip] = useState(0);
+  const skipped = useRef(false);
 
   const R = 54;
   const CIRC = 2 * Math.PI * R;
@@ -47,127 +87,299 @@ function IntroOverlay({
 
   useMotionValueEvent(progress, "change", (v) => setPct(Math.round(v)));
 
-  // Circular loader: 0 → 100
+  // Progress advances in chunks with plateaus — like a real game load.
   useEffect(() => {
-    const controls = animate(progress, 100, {
-      duration: 2.1,
-      ease: "easeInOut",
+    const controls = animate(progress, [0, 18, 18, 42, 42, 66, 66, 88, 100], {
+      duration: 3.6,
+      times: [0, 0.2, 0.32, 0.46, 0.58, 0.7, 0.82, 0.92, 1],
+      ease: "linear",
       onComplete: () => setGranted(true),
     });
     return () => controls.stop();
   }, [progress]);
 
-  // Brief "ACCESS GRANTED" beat, then the zoom begins.
+  const beginExit = useCallback(() => {
+    if (skipped.current) return;
+    skipped.current = true;
+    setOpening(true);
+    onReveal();
+  }, [onReveal]);
+
+  // Beat of "ACCESS GRANTED", then zoom through.
   useEffect(() => {
-    if (!granted || opening) return;
-    const t = window.setTimeout(() => {
-      setOpening(true);
-      onReveal();
-    }, 300);
+    if (!granted) return;
+    const t = window.setTimeout(beginExit, skipped.current ? 260 : 420);
     return () => window.clearTimeout(t);
-  }, [granted, opening, onReveal]);
+  }, [granted, beginExit]);
+
+  // Any key (Space / Enter / Escape / letters) or tap skips, like a game.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Tab" || e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) return;
+      skip();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Zoom finished → hand control back to the page.
   useEffect(() => {
     if (!opening) return;
-    const t = window.setTimeout(onDone, 1080);
+    const t = window.setTimeout(onDone, 1150);
     return () => window.clearTimeout(t);
   }, [opening, onDone]);
 
+  // Cycling game tips while loading.
+  useEffect(() => {
+    if (opening) return;
+    const id = window.setInterval(() => setTip((t) => (t + 1) % TIPS.length), 2400);
+    return () => window.clearInterval(id);
+  }, [opening]);
+
   const skip = () => {
+    if (skipped.current) return;
     progress.set(100);
     setGranted(true);
-    setOpening(true);
-    onReveal();
   };
+
+  const phase = phaseForPct(pct);
+  const logCount = LOG_AT.filter((at) => pct >= at).length;
 
   return (
     <motion.div
-      className="absolute inset-0 z-30 overflow-hidden bg-void"
+      className="absolute inset-0 z-30 select-none overflow-hidden bg-void"
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.25 }}
+      transition={{ duration: 0.3 }}
+      role="status"
       aria-label="Loading Shodhan's digital world"
+      onPointerDown={skip}
     >
-      {/* Light burst — expands from the center as the loader zooms through */}
-      <motion.div
+      {/* Ambient scene behind the loader */}
+      <div className="grid-floor absolute inset-0 opacity-50" aria-hidden="true" />
+      <div
         aria-hidden="true"
-        className="pointer-events-none absolute left-1/2 top-1/2 h-[130vmax] w-[130vmax] -translate-x-1/2 -translate-y-1/2 rounded-full"
-        initial={{ scale: 0, opacity: 0 }}
-        animate={opening ? { scale: 1, opacity: [0, 0.55, 0] } : { scale: 0, opacity: 0 }}
-        transition={opening ? { duration: 1, ease: EASE, times: [0, 0.35, 1] } : { duration: 0.01 }}
+        className="absolute inset-0"
         style={{
           background:
-            "radial-gradient(circle, rgba(125,180,255,0.4) 0%, rgba(62,224,255,0.14) 42%, transparent 72%)",
+            "radial-gradient(600px 600px at 50% 44%, rgba(77,141,255,0.1), transparent 65%)",
+        }}
+      />
+      {/* Scanlines */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 opacity-[0.05]"
+        style={{
+          backgroundImage:
+            "repeating-linear-gradient(0deg, rgba(255,255,255,0.5) 0px, rgba(255,255,255,0.5) 1px, transparent 1px, transparent 4px)",
+          animation: "scanmove 9s linear infinite",
+        }}
+      />
+      {/* Vignette */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(ellipse at center, transparent 52%, rgba(0,0,0,0.55) 100%)",
         }}
       />
 
-      {/* Loader — zooms toward the viewer and dissolves */}
+      {/* Top HUD */}
+      <div className="absolute inset-x-0 top-0 flex items-center justify-between px-5 py-4 font-mono text-[0.56rem] uppercase tracking-[0.3em] text-steel/70 sm:px-8">
+        <span className="flex items-center gap-2">
+          <span className="h-1.5 w-1.5 rounded-full bg-electric" />
+          SHODHAN.OS <span className="text-electric/70">v1.0</span>
+          <span className="hidden text-steel/50 sm:inline">· BUILD 2026.09.07</span>
+        </span>
+        <span className="text-steel/50">
+          NODE: <span className="text-mist">IN-SOUTH-1</span>
+        </span>
+      </div>
+
+      {/* Light burst — explodes from center as the loader zooms through */}
+      <motion.div
+        aria-hidden="true"
+        className="pointer-events-none absolute left-1/2 top-1/2 h-[130vmax] w-[130vmax] rounded-full"
+        initial={{ scale: 0, opacity: 0 }}
+        animate={opening ? { scale: 1, opacity: [0, 0.6, 0] } : { scale: 0, opacity: 0 }}
+        transition={opening ? { duration: 1.05, ease: EASE, times: [0, 0.35, 1] } : { duration: 0.01 }}
+        style={{
+          x: "-50%",
+          y: "-50%",
+          background:
+            "radial-gradient(circle, rgba(125,180,255,0.45) 0%, rgba(62,224,255,0.16) 42%, transparent 72%)",
+        }}
+      />
+
+      {/* Motion-streak ghosts during the zoom */}
+      {opening && (
+        <>
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute left-1/2 top-1/2 h-px w-[150vmax] bg-gradient-to-r from-transparent via-cyanflare/50 to-transparent blur-[2px]"
+            style={{ transform: "translate(-50%, -50%)" }}
+          />
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute left-1/2 top-1/2 h-px w-[95vmax] bg-gradient-to-r from-transparent via-violetflare/40 to-transparent"
+            style={{ transform: "translate(-50%, -50%) rotate(-14deg)" }}
+          />
+        </>
+      )}
+
+      {/* Loader — zooms toward the viewer with motion blur */}
       <motion.div
         className="absolute inset-0 z-10 flex flex-col items-center justify-center"
         animate={
           opening
-            ? { scale: 3.6, opacity: 0, filter: "blur(12px)" }
+            ? { scale: 4.4, opacity: 0, filter: "blur(16px)" }
             : { scale: 1, opacity: 1, filter: "blur(0px)" }
         }
-        transition={opening ? { duration: 0.95, ease: EASE } : { duration: 0.01 }}
+        transition={opening ? { duration: 1.05, ease: EASE } : { duration: 0.01 }}
       >
-        <div className="relative h-44 w-44 sm:h-52 sm:w-52">
-          {/* Track + inner dash ring + progress ring */}
-          <svg viewBox="0 0 120 120" className="h-full w-full -rotate-90">
-            <circle cx="60" cy="60" r={R} fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth="2" />
-            <circle
-              cx="60"
-              cy="60"
-              r={R - 9}
-              fill="none"
-              stroke="rgba(77,141,255,0.18)"
-              strokeWidth="1"
-              strokeDasharray="2 6"
-              style={{ animation: "spin 12s linear infinite" }}
-            />
-            <motion.circle
-              cx="60"
-              cy="60"
-              r={R}
-              fill="none"
-              stroke="#7db4ff"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeDasharray={CIRC}
-              style={{
-                strokeDashoffset: dashOffset,
-                filter: "drop-shadow(0 0 6px rgba(77,141,255,0.9))",
-              }}
-            />
-          </svg>
-          {/* Percentage */}
-          <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className="font-display text-5xl font-bold tabular-nums tracking-tight text-frost text-glow sm:text-6xl">
-              {pct}
-              <span className="align-top text-xl text-electric sm:text-2xl">%</span>
-            </span>
+        {/* Mini camera shake on ACCESS GRANTED */}
+        <motion.div
+          animate={granted && !opening ? { x: [0, -7, 7, -4, 4, 0] } : { x: 0 }}
+          transition={{ duration: 0.45, ease: "easeOut" }}
+          className="flex flex-col items-center"
+        >
+          <div className="relative h-44 w-44 sm:h-52 sm:w-52">
+            {/* Tick marks — mechanical dial */}
+            <svg viewBox="0 0 120 120" className="absolute inset-0 h-full w-full" aria-hidden="true">
+              {Array.from({ length: 48 }).map((_, i) => (
+                <line
+                  key={i}
+                  x1="60"
+                  y1="2.2"
+                  x2="60"
+                  y2={i % 4 === 0 ? "7.2" : "4.6"}
+                  stroke={i % 4 === 0 ? "rgba(125,180,255,0.55)" : "rgba(139,150,173,0.3)"}
+                  strokeWidth="0.8"
+                  transform={`rotate(${i * 7.5} 60 60)`}
+                />
+              ))}
+            </svg>
+
+            {/* Track + rotating dashed rings + progress arc */}
+            <svg viewBox="0 0 120 120" className="absolute inset-0 h-full w-full -rotate-90">
+              <circle cx="60" cy="60" r={R} fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth="2" />
+              <circle
+                cx="60"
+                cy="60"
+                r={R - 9}
+                fill="none"
+                stroke="rgba(77,141,255,0.2)"
+                strokeWidth="1"
+                strokeDasharray="2 6"
+                style={{ animation: "spin 9s linear infinite" }}
+              />
+              <circle
+                cx="60"
+                cy="60"
+                r={R - 16}
+                fill="none"
+                stroke="rgba(167,139,250,0.16)"
+                strokeWidth="1"
+                strokeDasharray="1 9"
+                style={{ animation: "spin 14s linear infinite reverse" }}
+              />
+              <motion.circle
+                cx="60"
+                cy="60"
+                r={R}
+                fill="none"
+                stroke="#7db4ff"
+                strokeWidth="3"
+                strokeLinecap="round"
+                strokeDasharray={CIRC}
+                style={{
+                  strokeDashoffset: dashOffset,
+                  filter: "drop-shadow(0 0 7px rgba(77,141,255,0.95))",
+                }}
+              />
+            </svg>
+
+            {/* Percentage */}
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+              <span className="font-display text-5xl font-bold tabular-nums tracking-tight text-frost text-glow sm:text-6xl">
+                {pct}
+                <span className="align-top text-xl text-electric sm:text-2xl">%</span>
+              </span>
+            </div>
           </div>
+
+          {/* Phase text */}
+          <p className="mt-8 h-5 font-mono text-[0.66rem] uppercase tracking-[0.46em] text-mist">
+            [ {granted ? <span className="text-signal">ACCESS GRANTED</span> : PHASES[phase]} ]
+            <span className="ml-1.5 animate-blink text-electric">▌</span>
+          </p>
+
+          {/* Boot log — appears line by line as progress passes checkpoints */}
+          <div className="mt-6 hidden h-40 w-[22rem] flex-col justify-start gap-0.5 overflow-hidden font-mono text-[0.6rem] leading-relaxed tracking-[0.08em] text-steel/80 sm:flex">
+            {LOG_LINES.slice(0, logCount).map((line, i) => (
+              <motion.p
+                key={line}
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.25 }}
+                className={i === logCount - 1 ? "text-electric/90" : undefined}
+              >
+                {line}
+              </motion.p>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Game tip */}
+        <div className="fixed bottom-24 left-0 right-0 px-6">
+          <p className="mx-auto max-w-2xl text-center font-mono text-[0.58rem] uppercase tracking-[0.24em] text-steel/70">
+            <span className="text-electric">TIP{String(tip + 1).padStart(2, "0")}:</span> {TIPS[tip]}
+          </p>
         </div>
 
-        <p className="mt-8 h-4 font-mono text-[0.62rem] uppercase tracking-[0.42em] text-steel">
-          {granted ? (
-            <span className="text-signal">ACCESS GRANTED</span>
-          ) : (
-            <>SYSTEM INITIALIZING<span className="ml-1 animate-blink text-electric">▌</span></>
-          )}
-        </p>
-        <p className="mt-2.5 font-mono text-[0.52rem] uppercase tracking-[0.34em] text-steel/50">
-          SHODHAN.OS <span className="text-electric/60">v1.0</span> · CLOUD CORE
-        </p>
-
-        <button
-          type="button"
-          onClick={skip}
-          className="mt-10 flex items-center gap-2 font-mono text-[0.6rem] uppercase tracking-[0.3em] text-steel/60 transition-colors hover:text-mist"
-        >
-          <SkipForward size={12} /> SKIP LOADING
-        </button>
+        {/* Press any key */}
+        {!opening && (
+          <motion.p
+            animate={{ opacity: [0.45, 1, 0.45] }}
+            transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
+            className="fixed bottom-12 left-0 right-0 flex items-center justify-center gap-2 px-6 font-mono text-[0.56rem] uppercase tracking-[0.34em] text-steel/70"
+          >
+            <SkipForward size={12} />
+            PRESS ANY KEY · TAP TO SKIP
+          </motion.p>
+        )}
       </motion.div>
+
+      {/* ACCESS GRANTED glitch flicker as the zoom begins */}
+      {opening && (
+        <motion.div
+          key="granted"
+          className="pointer-events-none absolute inset-0 z-[6] flex items-center justify-center"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: [0, 1, 0], scale: [0.9, 1, 1.06] }}
+          transition={{ duration: 0.8, times: [0, 0.3, 1], ease: "easeInOut" }}
+        >
+          <p
+            className="font-mono text-lg font-bold tracking-[0.5em] text-frost"
+            style={{
+              textShadow:
+                "0 0 24px rgba(77,141,255,0.9), 2px 0 rgba(255,60,120,0.5), -2px 0 rgba(62,224,255,0.5)",
+            }}
+          >
+            ACCESS GRANTED<span className="animate-blink text-electric">_</span>
+          </p>
+        </motion.div>
+      )}
+
+      {/* Bottom copyright bar */}
+      <div className="absolute inset-x-0 bottom-0 flex items-center justify-between border-t border-white/5 px-5 py-3 font-mono text-[0.5rem] uppercase tracking-[0.28em] text-steel/50 sm:px-8">
+        <span>© 2026 SHODHAN · ALL SYSTEMS RESERVED</span>
+        <span className="hidden sm:inline">CLOUD CORE // 100%</span>
+      </div>
+
+      {/* Animated scanlines keyframe */}
+      <style>{`@keyframes scanmove { from { background-position: 0 0; } to { background-position: 0 80px; } }`}</style>
     </motion.div>
   );
 }
