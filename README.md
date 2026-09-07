@@ -4,6 +4,10 @@ A premium, cinematic, scroll-driven portfolio for **Shodhan**, an aspiring Cloud
 Engineer from Karnataka, India. Built with React, TypeScript, Tailwind CSS and
 Framer Motion. Gaming-grade presentation, employment-grade honesty.
 
+> 📘 **New here? Start with [`GUIDE.md`](./GUIDE.md)** — a step-by-step guide
+> for running the project in VS Code, editing content/colors/animations, and
+> hosting it (Vercel / Netlify / GitHub Pages).
+
 ## Highlights
 
 - **Boot-sequence hero** — `booting shodhan.system → access granted`
