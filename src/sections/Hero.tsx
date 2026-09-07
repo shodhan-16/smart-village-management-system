@@ -407,6 +407,18 @@ function CommandCenter() {
         />
         <div className="absolute inset-[25%] rounded-full border border-violetflare/15" />
 
+        {/* Radar sweep */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-[24%] rounded-full"
+          style={{
+            background: "conic-gradient(from 0deg, rgba(77,141,255,0.14), transparent 70deg)",
+            animation: "spin 5s linear infinite",
+            maskImage: "radial-gradient(circle, black 62%, transparent 70%)",
+            WebkitMaskImage: "radial-gradient(circle, black 62%, transparent 70%)",
+          }}
+        />
+
         {/* Tick marks */}
         <svg className="absolute inset-0 h-full w-full" viewBox="0 0 100 100" aria-hidden="true">
           {Array.from({ length: 24 }).map((_, i) => (

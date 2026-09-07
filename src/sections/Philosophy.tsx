@@ -32,10 +32,19 @@ function WordSequencer() {
             <AnimatePresence mode="wait">
               <motion.p
                 key={index}
-                initial={{ opacity: 0, y: 34, filter: "blur(6px)" }}
-                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                initial={{ opacity: 0, y: 34, filter: "blur(6px)", textShadow: "0 0 0 transparent" }}
+                animate={{
+                  opacity: 1,
+                  y: 0,
+                  filter: "blur(0px)",
+                  textShadow: [
+                    "0 0 0 transparent",
+                    "2px 0 rgba(255,80,140,0.5), -2px 0 rgba(62,224,255,0.5)",
+                    "0 0 24px rgba(77,141,255,0.35), 0 0 80px rgba(77,141,255,0.15)",
+                  ],
+                }}
                 exit={{ opacity: 0, y: -34, filter: "blur(6px)" }}
-                transition={{ duration: 0.55, ease: EASE }}
+                transition={{ duration: 0.65, ease: EASE }}
                 className="font-display text-5xl font-bold tracking-tight text-frost text-glow sm:text-7xl"
               >
                 {philosophyWords[index]}

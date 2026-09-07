@@ -144,7 +144,7 @@ function ProjectCard({
 
         {/* Actions */}
         <div className="mt-8 flex flex-wrap items-center gap-3 border-t border-line pt-6 lg:mt-auto lg:pt-6">
-          <button type="button" onClick={onOpen} className="cta-primary group/btn !px-5 !py-3 !text-[0.66rem]">
+          <button type="button" onClick={onOpen} className="cta-primary group/btn fx-glitch !px-5 !py-3 !text-[0.66rem]">
             <FileSearch size={14} />
             OPEN CASE FILE
             <ArrowRight size={13} className="transition-transform duration-300 group-hover/btn:translate-x-1" />

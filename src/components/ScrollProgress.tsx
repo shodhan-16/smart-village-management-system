@@ -4,8 +4,8 @@ import { useActiveSection } from "../hooks/useActiveSection";
 import { scrollTo } from "../lib/scroll";
 
 /**
- * Scroll chrome: a slim top progress beam plus the vertical
- * 01 / 09 story rail and a mobile mini-indicator.
+ * Scroll chrome: a segmented XP-style progress beam plus the vertical
+ * 01 / 09 level-select rail and a mobile mini-indicator.
  */
 export function ScrollProgress() {
   const { scrollYProgress } = useScroll();
@@ -17,14 +17,24 @@ export function ScrollProgress() {
 
   return (
     <>
-      {/* Top progress beam */}
-      <motion.div
-        aria-hidden="true"
-        className="fixed inset-x-0 top-0 z-50 h-[2px] origin-left bg-gradient-to-r from-electric via-cyanflare/70 to-violetflare/60"
-        style={{ scaleX }}
-      />
+      {/* Top segmented XP beam */}
+      <div className="fixed inset-x-0 top-0 z-50 h-[3px] bg-white/[0.06]" aria-hidden="true">
+        <motion.div
+          className="absolute inset-y-0 left-0 bg-gradient-to-r from-electric via-cyanflare/80 to-violetflare/70"
+          style={{ scaleX }}
+        />
+        {/* Level segment ticks */}
+        <div className="absolute inset-0 flex">
+          {SECTION_ORDER.map((id, i) => (
+            <span
+              key={id}
+              className={`h-full flex-1 border-r border-void/70 ${i === SECTION_ORDER.length - 1 ? "border-r-0" : ""}`}
+            />
+          ))}
+        </div>
+      </div>
 
-      {/* Desktop rail */}
+      {/* Desktop level-select rail */}
       <nav
         aria-label="Story progress"
         className="fixed left-8 top-1/2 z-40 hidden -translate-y-1/2 flex-col gap-0 xl:flex"
@@ -33,8 +43,8 @@ export function ScrollProgress() {
           <span className="absolute inset-y-0 left-0 w-px bg-white/10" />
           <motion.span className="absolute left-0 top-0 w-px bg-electric" style={{ height: railScaleY }} />
         </div>
-        <ul className="flex flex-col gap-2.5">
-          {SECTION_ORDER.map((id) => {
+        <ul className="flex flex-col gap-1">
+          {SECTION_ORDER.map((id, i) => {
             const meta = SECTION_META[id];
             const isActive = active === id;
             return (
@@ -43,17 +53,18 @@ export function ScrollProgress() {
                   type="button"
                   onClick={() => scrollTo(id)}
                   aria-current={isActive ? "true" : undefined}
-                  className={`group flex items-center gap-3 font-mono text-[0.6rem] uppercase tracking-[0.3em] transition-colors duration-300 ${
-                    isActive ? "text-electric" : "text-steel/70 hover:text-mist"
+                  className={`group flex items-center gap-2.5 rounded-md px-2 py-1.5 font-mono text-[0.58rem] uppercase tracking-[0.24em] transition-all duration-300 ${
+                    isActive ? "bg-white/[0.05] text-electric" : "text-steel/60 hover:bg-white/[0.03] hover:text-mist"
                   }`}
                 >
-                  <span
-                    className={`relative h-1.5 w-1.5 rounded-full transition-all duration-300 ${
-                      isActive ? "bg-electric shadow-glow" : "bg-white/20 group-hover:bg-white/40"
-                    }`}
-                  >
-                    {isActive && (
+                  <span className={`text-[0.52rem] ${isActive ? "text-electric" : "text-steel/40"}`}>
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <span className="relative h-1 w-1 rounded-full transition-all duration-300">
+                    {isActive ? (
                       <span className="status-dot absolute inset-0 !bg-transparent [&::after]:bg-electric" />
+                    ) : (
+                      <span className="absolute inset-0 rounded-full bg-white/20 group-hover:bg-white/40" />
                     )}
                   </span>
                   {meta.nav}

@@ -119,6 +119,25 @@ body {
       0 0 0 1px rgba(77, 141, 255, 0.08),
       0 24px 60px -30px rgba(77, 141, 255, 0.25);
   }
+  /* Game-style scanline sweep across any card on hover */
+  .card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background: linear-gradient(
+      105deg,
+      transparent 42%,
+      rgba(125, 180, 255, 0.07) 50%,
+      transparent 58%
+    );
+    transform: translateX(-130%);
+    transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .card:hover::before {
+    transform: translateX(130%);
+  }
 
   .chip {
     @apply inline-flex items-center rounded-md border border-line bg-white/[0.03] px-2.5 py-1 font-mono text-[0.62rem] tracking-wider text-steel transition-colors duration-300;
@@ -213,6 +232,37 @@ body {
 
   .stack-list {
     @apply flex flex-wrap gap-2;
+  }
+
+  /* RGB-split glitch flicker on hover — game-UI accent */
+  .fx-glitch:hover {
+    animation: glitchShift 0.35s steps(2, end) infinite;
+  }
+  .fx-glitch:hover > * {
+    animation: glitchShift 0.35s steps(2, end) infinite;
+  }
+}
+
+@keyframes glitchShift {
+  0%,
+  100% {
+    text-shadow: 1.5px 0 rgba(255, 80, 140, 0.55), -1.5px 0 rgba(62, 224, 255, 0.55);
+  }
+  50% {
+    text-shadow: -1.5px 0 rgba(255, 80, 140, 0.55), 1.5px 0 rgba(62, 224, 255, 0.55);
+    transform: translateX(0.5px);
+  }
+}
+
+@keyframes tickBounce {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translateY(-3px);
+    opacity: 1;
   }
 }
 

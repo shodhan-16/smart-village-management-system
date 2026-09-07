@@ -16,6 +16,7 @@ import type { Project } from "../data/content";
 import { projectStatusColor } from "../data/content";
 import { EASE } from "../lib/motion";
 import { useLockBody } from "../hooks/useLockBody";
+import { HudCorners } from "./HudCorners";
 
 function ArchDiagram({ project }: { project: Project }) {
   const [selected, setSelected] = useState(0);
@@ -151,6 +152,16 @@ export function CaseStudy({ project, onClose }: { project: Project; onClose: () 
           transition={{ duration: 0.5, ease: EASE }}
           className="relative overflow-hidden rounded-2xl border border-line bg-ink shadow-[0_32px_80px_-40px_rgba(0,0,0,0.9),0_0_0_1px_rgba(77,141,255,0.06)]"
         >
+          {/* HUD corners */}
+          <HudCorners inset="-inset-2" />
+          {/* scan sweep on open */}
+          <motion.span
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-y-0 left-0 w-40 bg-gradient-to-r from-transparent via-electric/[0.09] to-transparent"
+            initial={{ x: "-140%" }}
+            animate={{ x: "1400%" }}
+            transition={{ duration: 1.4, ease: EASE }}
+          />
           {/* Top accent */}
           <div className="h-px w-full bg-gradient-to-r from-transparent via-electric/60 to-transparent" />
           {/* Top HUD */}
@@ -158,6 +169,15 @@ export function CaseStudy({ project, onClose }: { project: Project; onClose: () 
             <p className="flex items-center gap-3 font-mono text-[0.6rem] uppercase tracking-[0.26em] text-steel">
               <Terminal size={13} className="text-electric" />
               MISSION SELECTED <span className="text-electric">// {project.codename}</span>
+              <span className="ml-2 flex items-end gap-1" aria-hidden="true">
+                {[0, 1, 2].map((i) => (
+                  <span
+                    key={i}
+                    className="h-1 w-1 rounded-full bg-electric/80"
+                    style={{ animation: `tickBounce 1s ${i * 0.16}s ease-in-out infinite` }}
+                  />
+                ))}
+              </span>
             </p>
             <button
               type="button"

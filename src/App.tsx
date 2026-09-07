@@ -4,6 +4,7 @@ import { Footer } from "./components/Footer";
 import { Header } from "./components/Header";
 import { ScrollProgress } from "./components/ScrollProgress";
 import { Marquee } from "./components/Marquee";
+import { SectionGate } from "./components/SectionGate";
 import { Hero } from "./sections/Hero";
 import { About } from "./sections/About";
 import { Education } from "./sections/Education";
@@ -25,6 +26,7 @@ export default function App() {
 
       <main className="relative z-10">
         <Hero />
+        <SectionGate />
         <Marquee
           items={[
             "CLOUD COMPUTING",
@@ -42,14 +44,23 @@ export default function App() {
             "VPC",
           ]}
         />
+        <SectionGate />
         <About />
+        <SectionGate />
         <Education />
+        <SectionGate />
         <Skills />
+        <SectionGate />
         <CloudJourney />
+        <SectionGate />
         <Projects />
+        <SectionGate />
         <Certifications />
+        <SectionGate />
         <WhatIBuild />
+        <SectionGate />
         <Philosophy />
+        <SectionGate />
         <Contact />
       </main>
 
