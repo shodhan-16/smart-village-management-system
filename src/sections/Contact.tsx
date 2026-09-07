@@ -106,7 +106,7 @@ export function Contact() {
                     onClick={(e) => {
                       if (!href) e.preventDefault();
                     }}
-                    className="group flex items-center justify-between rounded-lg border border-line bg-panel/60 px-5 py-4 transition-all duration-500 hover:border-electric/50 hover:shadow-glow"
+                    className="card group flex items-center justify-between rounded-lg px-5 py-4 hover:-translate-y-0.5"
                   >
                     <span>
                       <span className="flex items-center gap-2.5 font-mono text-[0.66rem] font-semibold tracking-[0.22em] text-frost">
@@ -137,7 +137,7 @@ export function Contact() {
 
           <Reveal delay={1}>
             <ConnectionTerminal />
-            <div className="mt-6 flex items-center justify-between rounded-lg border border-line bg-white/[0.02] px-5 py-4">
+            <div className="panel mt-6 flex items-center justify-between px-5 py-4">
               <div>
                 <p className="font-mono text-[0.58rem] uppercase tracking-[0.25em] text-steel/70">COORDINATES</p>
                 <p className="mt-1 font-mono text-[0.68rem] tracking-[0.14em] text-mist">Karnataka, India</p>

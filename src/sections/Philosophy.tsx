@@ -74,11 +74,13 @@ export function Philosophy() {
       />
 
       <div className="shell relative flex flex-col items-center text-center">
-        <p className="mono-label mb-10">CYCLE 07 — ENGINEERING PHILOSOPHY</p>
+        <p className="mono-label mb-12 flex items-center gap-3">
+          <span className="status-dot" /> CYCLE 07 — ENGINEERING PHILOSOPHY
+        </p>
 
         <WordSequencer />
 
-        <div className="mx-auto mt-16 h-px w-24 bg-electric/40" />
+        <div className="mx-auto mt-16 h-px w-24 bg-gradient-to-r from-transparent via-electric/50 to-transparent" />
 
         <blockquote className="mx-auto mt-12 max-w-3xl">
           <p className="font-display text-2xl font-medium leading-snug tracking-tight text-mist sm:text-4xl">

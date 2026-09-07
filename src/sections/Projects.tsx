@@ -70,10 +70,11 @@ function ProjectCard({
         rotateX.set(0);
         rotateY.set(0);
       }}
-      className={`group relative h-full overflow-hidden rounded-2xl border border-line bg-panel/70 p-6 transition-colors duration-500 sm:p-8 ${accent.border} ${
+      className={`card group h-full rounded-2xl p-6 sm:p-8 ${accent.border} ${
         featured ? "lg:col-span-2" : ""
       }`}
     >
+      <div className="pointer-events-none absolute inset-0 rounded-2xl bg-[radial-gradient(120%_90%_at_50%_-10%,rgba(77,141,255,0.06),transparent_60%)]" />
       {/* Accent wash */}
       <div className={`absolute -right-20 -top-20 h-64 w-64 rounded-full blur-3xl transition-opacity duration-500 ${accent.glow} opacity-60 group-hover:opacity-100`} />
       {/* Animated scanline */}
@@ -143,7 +144,7 @@ function ProjectCard({
 
         {/* Actions */}
         <div className="mt-8 flex flex-wrap items-center gap-3 border-t border-line pt-6 lg:mt-auto lg:pt-6">
-          <button type="button" onClick={onOpen} className="cta-primary group/btn !px-5 !py-3">
+          <button type="button" onClick={onOpen} className="cta-primary group/btn !px-5 !py-3 !text-[0.66rem]">
             <FileSearch size={14} />
             OPEN CASE FILE
             <ArrowRight size={13} className="transition-transform duration-300 group-hover/btn:translate-x-1" />
@@ -174,8 +175,8 @@ function ProjectCard({
           >
             <ExternalLink size={16} />
           </a>
-          <span className="ml-auto hidden font-mono text-[0.55rem] uppercase tracking-[0.25em] text-steel/60 sm:block">
-            CLICK TO DECRYPT_
+          <span className="ml-auto hidden font-mono text-[0.55rem] uppercase tracking-[0.22em] text-steel/60 sm:block">
+            CASE FILE AVAILABLE
           </span>
         </div>
       </div>

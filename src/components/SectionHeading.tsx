@@ -9,32 +9,34 @@ type Props = {
   align?: "left" | "center";
 };
 
-/** Consistent animated section header: [INDEX — EYEBROW] + title. */
+/** Consistent animated section header: INDEX / EYEBROW on a hairline, then title. */
 export function SectionHeading({ index, eyebrow, title, description, align = "left" }: Props) {
   const centered = align === "center";
   return (
-    <div className={`mb-12 flex flex-col gap-4 sm:mb-16 ${centered ? "items-center text-center" : ""}`}>
+    <div className={`mb-14 flex flex-col gap-6 sm:mb-20 ${centered ? "items-center text-center" : ""}`}>
       <motion.div
         variants={fadeUp}
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.4 }}
-        className="flex items-center gap-3"
+        className={`flex w-full items-center gap-4 ${centered ? "justify-center" : ""}`}
       >
         <span className="section-number">{index}</span>
-        <span className="h-px w-10 bg-electric/50" aria-hidden="true" />
-        <span className="mono-label">{eyebrow}</span>
+        <span className="mono-label whitespace-nowrap">{eyebrow}</span>
+        <span className="h-px flex-1 bg-gradient-to-r from-line to-transparent" aria-hidden="true" />
       </motion.div>
+
       <motion.h2
         variants={fadeUp}
         custom={1}
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.4 }}
-        className="max-w-3xl font-display text-4xl font-bold leading-[1.05] tracking-tight text-frost sm:text-5xl lg:text-6xl"
+        className="display-xl max-w-3xl"
       >
         {title}
       </motion.h2>
+
       {description && (
         <motion.p
           variants={fadeUp}
@@ -42,7 +44,7 @@ export function SectionHeading({ index, eyebrow, title, description, align = "le
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.4 }}
-          className={`max-w-xl text-sm leading-relaxed text-steel sm:text-base ${centered ? "mx-auto" : ""}`}
+          className={`body-sm max-w-xl ${centered ? "mx-auto" : ""}`}
         >
           {description}
         </motion.p>

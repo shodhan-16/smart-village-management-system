@@ -15,7 +15,7 @@ function SkillCard({ category, index }: { category: SkillCategory; index: number
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.2 }}
       transition={{ duration: 0.7, ease: EASE, delay: (index % 3) * 0.1 }}
-      className="group relative flex h-full flex-col overflow-hidden rounded-xl border border-line bg-panel/60 p-6 transition-all duration-500 hover:-translate-y-1.5 hover:border-electric/45 hover:shadow-glow"
+      className="card group flex h-full flex-col p-6 hover:-translate-y-1"
     >
       {/* Connection lines — fade in on hover */}
       <svg
@@ -81,7 +81,7 @@ function SkillCard({ category, index }: { category: SkillCategory; index: number
 
       {/* Live description */}
       <div className="relative mt-auto pt-5">
-        <div className="h-[52px] overflow-hidden rounded-md border border-line/70 bg-void/60 px-3.5">
+        <div className="h-[54px] overflow-hidden rounded-md border border-line/70 bg-void/60 px-3.5">
           <AnimatePresence mode="wait">
             {active ? (
               <motion.p

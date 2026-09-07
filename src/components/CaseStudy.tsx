@@ -149,11 +149,13 @@ export function CaseStudy({ project, onClose }: { project: Project; onClose: () 
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 24, scale: 0.98 }}
           transition={{ duration: 0.5, ease: EASE }}
-          className="relative overflow-hidden rounded-2xl border border-electric/25 bg-ink shadow-glow"
+          className="relative overflow-hidden rounded-2xl border border-line bg-ink shadow-[0_32px_80px_-40px_rgba(0,0,0,0.9),0_0_0_1px_rgba(77,141,255,0.06)]"
         >
+          {/* Top accent */}
+          <div className="h-px w-full bg-gradient-to-r from-transparent via-electric/60 to-transparent" />
           {/* Top HUD */}
           <div className="flex items-center justify-between border-b border-line px-5 py-4 sm:px-8">
-            <p className="flex items-center gap-3 font-mono text-[0.62rem] uppercase tracking-[0.3em] text-steel">
+            <p className="flex items-center gap-3 font-mono text-[0.6rem] uppercase tracking-[0.26em] text-steel">
               <Terminal size={13} className="text-electric" />
               MISSION SELECTED <span className="text-electric">// {project.codename}</span>
             </p>
@@ -279,8 +281,8 @@ export function CaseStudy({ project, onClose }: { project: Project; onClose: () 
                 {project.demo ? "LIVE DEMO" : "DEMO — LINK PENDING"}
                 {project.demo ? <ExternalLink size={14} /> : <ArrowRight size={14} />}
               </a>
-              <button type="button" onClick={onClose} className="ml-auto flex items-center gap-2 font-mono text-[0.62rem] uppercase tracking-[0.25em] text-steel transition-colors hover:text-frost">
-                <Wrench size={13} /> CLOSE FILE
+              <button type="button" onClick={onClose} className="ml-auto flex items-center gap-2 font-mono text-[0.62rem] uppercase tracking-[0.22em] text-steel transition-colors hover:text-frost">
+                <Wrench size={13} /> CLOSE
               </button>
             </div>
           </div>

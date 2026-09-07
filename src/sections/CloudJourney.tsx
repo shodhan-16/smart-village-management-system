@@ -87,7 +87,7 @@ function InfraMap() {
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true, amount: 0.4 }}
                 transition={{ duration: 0.55, ease: EASE, delay: i * 0.16 }}
-                className="group flex items-center gap-4 rounded-lg border border-line bg-void/70 p-4 transition-all duration-500 hover:border-electric/50 hover:bg-electric/[0.05] hover:shadow-glow"
+                className="group flex items-center gap-4 rounded-lg border border-line bg-void/70 p-4 transition-all duration-500 hover:-translate-y-0.5 hover:border-electric/45 hover:bg-electric/[0.04] hover:shadow-[0_12px_32px_-20px_rgba(77,141,255,0.5)]"
               >
                 <div className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-md border border-electric/25 bg-electric/[0.08] text-electric transition-transform duration-500 group-hover:scale-110">
                   <span className="absolute inset-0 rounded-md border border-electric/20 animate-pulse-dot motion-reduce:animate-none" style={{ animationDelay: `${i * 0.45}s` }} />

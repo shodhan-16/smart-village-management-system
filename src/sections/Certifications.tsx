@@ -24,7 +24,7 @@ export function Certifications() {
                 <motion.article
                   whileHover={{ y: -6 }}
                   transition={{ duration: 0.35, ease: EASE }}
-                  className="group relative flex h-full flex-col overflow-hidden rounded-xl border border-line bg-panel/60 p-6 transition-colors duration-500 hover:border-electric/45 hover:shadow-glow sm:p-7"
+                  className="card group flex h-full flex-col p-6 hover:-translate-y-1 sm:p-7"
                 >
                   <div className="absolute -right-14 -top-14 h-36 w-36 rounded-full bg-electric/[0.06] blur-2xl transition-opacity duration-500 group-hover:opacity-100" />
 

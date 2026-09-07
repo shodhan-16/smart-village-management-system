@@ -24,7 +24,7 @@ export function WhatIBuild() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.3 }}
                 transition={{ duration: 0.7, ease: EASE, delay: i * 0.12 }}
-                className="group relative flex h-full flex-col overflow-hidden rounded-xl border border-line bg-panel/60 p-6 transition-all duration-500 hover:-translate-y-1.5 hover:border-violetflare/45 hover:shadow-glow"
+                className="card group flex h-full flex-col p-6 hover:-translate-y-1 hover:border-violetflare/40"
               >
                 <span className="absolute right-4 top-4 font-mono text-[0.55rem] tracking-[0.28em] text-steel/50">
                   {pillar.tag}

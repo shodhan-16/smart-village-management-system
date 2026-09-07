@@ -72,7 +72,7 @@ function ProfileCard() {
 
       {/* Mindset pipeline */}
       <div className="mt-8">
-        <p className="flex items-center gap-2 font-mono text-[0.58rem] uppercase tracking-[0.28em] text-steel">
+        <p className="flex items-center gap-2 font-mono text-[0.58rem] uppercase tracking-[0.26em] text-steel">
           <Cpu size={12} className="text-electric/80" /> ENGINEERING MINDSET
         </p>
         <div className="mt-4 flex items-center gap-2">
@@ -118,33 +118,33 @@ export function About() {
         <div className="grid gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
           <div>
             <Reveal>
-              <p className="max-w-2xl font-display text-2xl font-medium leading-snug tracking-tight text-frost sm:text-3xl">
+              <p className="max-w-2xl font-display text-[1.6rem] font-semibold leading-snug tracking-tight text-frost sm:text-[2rem]">
                 I'm <span className="text-electric">Shodhan</span>, an Information Science &amp;
                 Engineering student focused on building my career in{" "}
-                <span className="text-electric text-glow">Cloud Engineering</span>.
+                <span className="text-electric">Cloud Engineering</span>.
               </p>
             </Reveal>
 
-            <div className="mt-10 grid grid-cols-3 gap-px overflow-hidden rounded-xl border border-line bg-line/70">
-              <div className="bg-void/80 p-5">
+            <div className="mt-12 grid grid-cols-3 gap-px overflow-hidden rounded-xl border border-line bg-line/70">
+              <div className="bg-void/90 p-5">
                 <CountUp value={projects.length} label="PROJECTS SHIPPED" />
               </div>
-              <div className="bg-void/80 p-5">
+              <div className="bg-void/90 p-5">
                 <CountUp value={certifications.length} label="CERTIFICATIONS" />
               </div>
-              <div className="bg-void/80 p-5">
+              <div className="bg-void/90 p-5">
                 <CountUp value={cloudServices.length} label="CORE AWS SERVICES" />
               </div>
             </div>
 
             <div className="mt-10 grid gap-4 sm:grid-cols-2">
               {aboutParagraphs.map((item, i) => (
-                <Reveal key={item.title} delay={i * 0.5} className="group">
-                  <div className="h-full rounded-lg border border-line bg-white/[0.015] p-5 transition-all duration-500 hover:-translate-y-1 hover:border-electric/40 hover:bg-electric/[0.04]">
-                    <p className="font-mono text-[0.6rem] uppercase tracking-[0.28em] text-electric/90">
+                <Reveal key={item.title} delay={i * 0.5}>
+                  <div className="card group h-full p-5 hover:-translate-y-0.5">
+                    <p className="font-mono text-[0.6rem] uppercase tracking-[0.26em] text-electric/90">
                       {String(i + 1).padStart(2, "0")} / {item.title}
                     </p>
-                    <p className="mt-2.5 text-[0.85rem] leading-relaxed text-steel group-hover:text-mist">
+                    <p className="mt-2.5 text-[0.85rem] leading-relaxed text-steel transition-colors duration-300 group-hover:text-mist">
                       {item.text}
                     </p>
                   </div>

@@ -469,15 +469,15 @@ function CommandCenter() {
       <div className="panel relative mt-8 grid grid-cols-2 gap-px overflow-hidden bg-line/60">
         {statusLines.map(({ icon: Icon, label, value }) => (
           <div key={label} className="bg-void/90 p-3.5">
-            <p className="flex items-center gap-1.5 font-mono text-[0.52rem] uppercase tracking-[0.3em] text-steel/70">
+            <p className="flex items-center gap-1.5 font-mono text-[0.52rem] uppercase tracking-[0.26em] text-steel/70">
               <Icon size={11} className="text-electric/80" /> {label}
             </p>
-            <p className="mt-1.5 font-mono text-[0.68rem] tracking-[0.14em] text-frost">{value}</p>
+            <p className="mt-1.5 font-mono text-[0.68rem] tracking-[0.12em] text-frost">{value}</p>
           </div>
         ))}
       </div>
 
-      <p className="mt-4 text-center font-mono text-[0.55rem] uppercase tracking-[0.4em] text-steel/60">
+      <p className="mt-4 text-center font-mono text-[0.55rem] uppercase tracking-[0.36em] text-steel/60">
         shodhan.system · command center
       </p>
     </div>
@@ -576,20 +576,24 @@ export function Hero() {
 
           <motion.div
             variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: EASE } } }}
-            className="mt-6 flex flex-wrap items-center gap-4"
+            className="mt-7 flex flex-wrap items-center gap-x-4 gap-y-3"
           >
-            <span className="h-px w-10 bg-electric/70" aria-hidden="true" />
-            <p className="font-mono text-[clamp(0.8rem,2.4vw,1.05rem)] font-semibold uppercase tracking-[0.35em] text-electric">
+            <p className="font-mono text-[clamp(0.78rem,2.2vw,1rem)] font-semibold uppercase tracking-[0.32em] text-electric">
               {identity.role}
             </p>
-            <span className="rounded border border-electric/30 bg-electric/5 px-2 py-0.5 font-mono text-[0.55rem] tracking-[0.25em] text-electric/90">
-              EST. 2023
-            </span>
+            <span className="h-4 w-px bg-line" aria-hidden="true" />
+            <p className="font-mono text-[0.62rem] uppercase tracking-[0.24em] text-steel">
+              Karnataka, India
+            </p>
+            <span className="h-4 w-px bg-line" aria-hidden="true" />
+            <p className="font-mono text-[0.62rem] uppercase tracking-[0.24em] text-steel">
+              BE · Info Science <span className="text-steel/60">2023—27</span>
+            </p>
           </motion.div>
 
           <motion.p
             variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: EASE } } }}
-            className="mt-6 max-w-xl text-sm leading-relaxed text-steel sm:text-base"
+            className="mt-6 max-w-xl text-[0.95rem] leading-relaxed text-steel sm:text-base"
           >
             {identity.tagline}
           </motion.p>
@@ -604,7 +608,7 @@ export function Hero() {
               <motion.li
                 key={item}
                 variants={{ hidden: { opacity: 0, scale: 0.9 }, visible: { opacity: 1, scale: 1 } }}
-                className="chip hover:border-electric/50 hover:text-frost"
+                className="chip"
               >
                 {item}
               </motion.li>
@@ -614,23 +618,23 @@ export function Hero() {
           {/* CTAs */}
           <motion.div
             variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: EASE } } }}
-            className="mt-10 flex flex-wrap items-center gap-4"
+            className="mt-10 flex flex-wrap items-center gap-3.5"
           >
             <button type="button" onClick={() => scrollTo("about")} className="cta-primary group">
               EXPLORE MY JOURNEY
               <ArrowRight size={15} className="transition-transform duration-300 group-hover:translate-x-1" />
             </button>
             <button type="button" onClick={() => scrollTo("projects")} className="cta-ghost group">
-              <FolderGit2 size={15} className="text-electric" />
+              <FolderGit2 size={15} />
               VIEW PROJECTS
             </button>
             <a
               href={links.resume}
               download
-              className="group flex items-center gap-2 px-2 py-2 font-mono text-[0.62rem] uppercase tracking-[0.25em] text-steel transition-colors hover:text-frost"
+              className="cta-link px-2"
             >
-              <FileText size={13} className="transition-transform duration-300 group-hover:-translate-y-0.5" />
-              RESUME <span className="text-electric/70">· PDF</span>
+              RESUME
+              <FileText size={13} />
             </a>
           </motion.div>
         </motion.div>
@@ -653,7 +657,7 @@ export function Hero() {
         initial={{ opacity: 0 }}
         animate={revealed ? { opacity: 1 } : {}}
         transition={{ delay: 0.9, duration: 0.8 }}
-        className="shell relative z-10 hidden items-center justify-between gap-6 border-t border-line/70 py-4 font-mono text-[0.56rem] uppercase tracking-[0.28em] text-steel/70 md:flex"
+        className="shell relative z-10 hidden items-center justify-between gap-6 border-t border-line/70 py-4 font-mono text-[0.55rem] uppercase tracking-[0.24em] text-steel/70 md:flex"
       >
         <span className="flex items-center gap-2">
           <span className="h-1 w-1 rounded-full bg-electric" /> KARNATAKA · INDIA

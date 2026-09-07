@@ -85,8 +85,11 @@ export function Education() {
                     <Icon size={16} className="text-electric" />
                   </span>
 
-                  <div className="group panel relative overflow-hidden p-6 transition-all duration-500 hover:border-electric/40 hover:shadow-glow sm:p-8">
-                    <div className="absolute -right-16 -top-16 h-40 w-40 rounded-full bg-electric/[0.07] blur-2xl transition-opacity duration-500 group-hover:opacity-100" />
+                  <div className="group card relative p-6 hover:-translate-y-1 sm:p-8">
+                    <div
+                      className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full bg-electric/[0.07] blur-2xl opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                      aria-hidden="true"
+                    />
 
                     <div className="flex flex-wrap items-center gap-3">
                       <span className="flex items-center gap-2 rounded border border-electric/30 bg-electric/10 px-2.5 py-1 font-mono text-[0.6rem] uppercase tracking-[0.22em] text-electric">
